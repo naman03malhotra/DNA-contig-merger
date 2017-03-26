@@ -1,57 +1,166 @@
-// Read data
-	// for loop
-// Match data
-	// Substring match
-// merge
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DNA Merge</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+</head>
+<body>
+	<nav class="navbar navbar-inverse" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+
+				<a class="navbar-brand" href="#">DNA Merger</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+
+			</div>
+		</div>
+	</nav>
+
+	<div class="container-fluid text-center">
+		<div class="row">
+			<h2>Merge DNA</h2>
+			<div class="col-md-6">
+				<h4>Input DNA data to merge</h4>
+				<textarea id="inp" rows=10 cols=75></textarea>
+				<br>
+				<button class="btn btn-primary btn-lg" onclick="load()">Merge</button>
+			</div>
+			<div class="col-md-6">
+				<h4>Output</h4>
+				<div class="panel-default text-left" id="out" style="word-wrap: break-word;word-break: break-all;"></div>
+			</div>
+		</div>
+		<div class="row"></div>
+	</div>
+	<br>
+	<br>
+	<div class="container-fluid text-center">
+		<div class="row">
+			<h2>Find Pattern</h2>
+			<div class="col-md-6">
+				<input type="text" id="key" placeholder="Pattern to find" />
+				<h4>Input DNA data</h4>
+				<textarea id="inp2" rows=10 cols=75></textarea>
+				<br>
+				<button class="btn btn-primary btn-lg" onclick="find()">Find Pattern</button>
+			</div>
+			<div class="col-md-6">
+				<h4>Output</h4>
+				<div class="panel-default text-left" id="out2" style="word-wrap: break-word;word-break: break-all;"></div>
+				<p> Position of Pattern</p>
+				<div class="panel-default text-left" id="out3" style="word-wrap: break-word;"></div>
+
+			</div>
+		</div>
+		<div class="row"></div>
+		<br>
+		<br>
+
+	</div>
 
 
+</body>
+</html>
 <script>
+/*var real_data = 
+'C2AACCAATTGGTGTCGGGAACCTGTACCGCCTGATGCGGGGCTATGCGGAA\nH4CGGAAGTATGTGGGTGCTGCCGGAAGTCCGGCGCAGATGCGGCGGGCCGA\nN8GCCGATTAATTTTAATCAGAACAATCACGTGGTGATTCAGAACGACGGTA\nT9CGAAATTTTGCGACCGGAGGATTTACGGGAACCGGCGGCAAATATGAGCC\nG1TGGCCAGGTGCGCAGGATGAGCTCCGGCTGCAGTTGCGTGATGGCGGTCT\nI5GGTGGGGATTGTCGGGAGTATCGGCAGCGCTATTGGCGGGGCTGTTGGTG\nO6TGGTGGCATCCGCGTCAGGCGGTACAGCCATTCAGGCAGCTGCGGCGAAA\nB1CTCCGTGCTGTCCATGATGACAGAAATTCTGCTGAAGCAGGCAATGGTGG\nL7CGGTAGGACAGGCCGGGCCGCAGCTGATGAAAGCGGTGTATGAGATGGCC\nE3GAGCCGGATTGTCCACCGCGGGGAGTTTGTCTTCACGAAGGAGGCAACCA';*/
 
-var dat=['asjhdkvjajashvd12345','12345kasbdkbaksbdkjbasd45678','45678kajbsdkabsdkjbasdjk34567','34567akbsdkjbaskjd'];
-var final_string = '';
+var preprocess = function(data){
+	var data = data.toString().split('\n');
+	for(var i = 0;i<data.length;i++)
+	{
+		data[i] = data[i].substring(2,data[i].length); 
+	}
+	return data;
+}
+
+
+
 function match(data)
 {
-	for(var i=0;i<data.length;i++)
+	var i;
+	var count=0;
+	for(var k=0;k<data.length;k++)
 	{
-		var end_string = data[i].substring(data[i].length-5,data[i].length);
-		//console.log(end_string);
-		for(var j=i+1;j<data.length;j++)
+		var count2=0;
+		var front_string = data[k].substring(0,5);	
+		for(var l=0;l<data.length;l++)
 		{
-			var front_string = data[j].substring(0,5);
-			console.log('fq:'+'j:'+j+'_'+front_string);
-			if(end_string==front_string)
-			{
-				final_string = data[i] + data[j].substring(data[j].length-45,data[j].length);
-			}
+			var end_string = data[l].substring(data[l].length-5,data[l].length);
+			if(front_string!=end_string)
+				count2++;
+		}
+		if(count2==data.length)
+		{
+			i=k;
+			break;
 		}
 	}
-	console.log('ans:'+final_string);
 
-
-	
-}
-//match(dat);
-
-
-var match2 = function(data)
-{
-	var obj = {};
-	var fin_arr = [];
-	data.forEach(function(dat,i){
-			if(!obj[dat.substring(0,5)])
+	var final_string = data[i].substring(0,data[i].length-5);
+	while(count!=data.length-1)
+	{
+		var end_string = data[i].substring(data[i].length-5,data[i].length);
+		for(var j=0;j<data.length;j++)
+		{
+			var front_string = data[j].substring(0,5);
+			if(end_string==front_string)
 			{
-				obj[dat.substring(0,5)]=1;
-				console.log('I have '+i);
+				final_string += '<span class="bg-primary">('+data[j].substring(0,5)+')</span>'+data[j].substring(data[j].length-45,data[j].length);
+				i=j;
+				count++;
+
+				break;
 			}
+		}
+		
+	}
+	document.getElementById('out').innerHTML = final_string;
+}
+
+var load = function(){
+	var real_data = document.getElementById('inp').value;
+	match(preprocess(real_data));
+}
+
+function findPattern(key,data){
+	key= key.toString();
+	data = data.toString();
+	var final_string='',val,pos=0,posArr=[];
+	var keylen = key.length;
+	for(var i=0;i<data.length;i++)
+	{
+		val = data.substring(i,i+keylen);		
+		if(key == val)
+		{
+			console.log('i:'+i);
+			final_string += data.substring(pos,i)+'<span class="bg-primary">('+val+')</span>';
+			if(key == data.substring(i+1, i+1+keylen))
+				pos = i+1;
 			else
-			{
-				fin_arr.push(dat);
-			}
-	});
-	console.log(fin_arr);
-	console.log(obj);
+				pos = i+keylen;
+			console.log(pos);
+			posArr.push(i);	
+		}
+	}
+	final_string += data.substring(pos,data.length);
+
+	document.getElementById('out2').innerHTML = final_string;
+	document.getElementById('out3').innerHTML = posArr;	
 }
-match2(dat);
+
+
+
+
+var find = function() {
+	var real_data = document.getElementById('inp2').value;
+	var key = document.getElementById('key').value;
+	key = key.toUpperCase();
+	findPattern(key,real_data);
+}
+
 </script>
 
 
